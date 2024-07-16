@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const task = require("../controllers/taskController");
+const task = require("../controllers/task.controller");
 
 // 获取任务列表（分页）
 router.get("/getTaskList", task.getTaskList);
