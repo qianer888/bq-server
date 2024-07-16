@@ -1,0 +1,35 @@
+{
+  "name": "bq-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "sequelize",
+    "mysql2"
+  ],
+  "author": "yinqianqian",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.17.1",
+    "mysql2": "^3.10.2",
+    "sequelize": "^6.37.3"
+  },
+  "config": {
+    "port": 9000,
+    "cros": {
+      "open": false,
+      "safeList": []
+    },
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
