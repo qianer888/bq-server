@@ -1,4 +1,5 @@
 const db = require("../models");
+const { logger } = require('../config/logger');
 const sequelize = db.sequelize;
 const Task = db.task;
 const { responsePublic } = require("../utils");
@@ -80,7 +81,7 @@ async function addTask(req, res) {
 
   Task.create(body)
     .then((data) => {
-      console.log(data, ": addTask - data");
+      logger.info(data, ": addTask - data");
       responsePublic(res, true, { data: data.id });
     })
     .catch((err) => {

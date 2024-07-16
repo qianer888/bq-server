@@ -3,6 +3,7 @@ const express = require("express");
 const http = require("http");
 const bodyparser = require("body-parser");
 
+const { logger } = require("./config/logger");
 const { sequelize } = require("./models");
 const routes = require("./routes/index");
 
@@ -13,7 +14,7 @@ const app = express();
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
-  console.log(
+  logger.info(
     `✨✨ THE WEB SERVICE SUCCESSFULLY AND LISTENING TO THE PORT：${PORT}!`
   );
 });
@@ -22,10 +23,10 @@ server.listen(PORT, () => {
 sequelize
   .sync()
   .then(() => {
-    console.log("Synced db.");
+    logger.info("Synced db.");
   })
   .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
+    logger.error("Failed to sync db: " + err.message);
   });
 
 // 中间件
@@ -61,25 +62,25 @@ for (const key in routes) {
 }
 
 function handleShutdown(signal) {
-  console.log(`🔌🔌 Received ${signal}. Closing server...`);
+  logger.info(`🔌🔌 Received ${signal}. Closing server...`);
   server.close(() => {
-    console.log("🔌🔌 Server closed.");
+    logger.info("🔌🔌 Server closed.");
     // 关闭数据库
     sequelize
       .close()
       .then(() => {
-        console.log("🔌🔌 closed db..");
+        logger.info("🔌🔌 closed db..");
         process.exit(0); // 正常退出
       })
       .catch((err) => {
-        console.log("🔌🔌 Failed to close db: " + err.message);
+        logger.error("🔌🔌 Failed to close db: " + err.message);
         process.exit(1);
       });
   });
 
   // 超时未关闭，进行强制关闭
   setTimeout(() => {
-    console.error("🔌🔌 Forcing server shutdown.");
+    logger.error("🔌🔌 Forcing server shutdown.");
     process.exit(1);
   }, 5000);
 }
