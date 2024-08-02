@@ -1,5 +1,5 @@
 const db = require("../models");
-const { logger } = require('../config/logger');
+const { logger } = require("../config/logger");
 const sequelize = db.sequelize;
 const Task = db.task;
 const { responsePublic } = require("../utils");
@@ -18,9 +18,8 @@ async function getTaskList(req, res) {
   const offset = (pageNo - 1) * pageSize;
   try {
     // 查询总记录数
-    const total = await Task.count();
+    // const total = await Task.count();
     let list = [];
-
     let where = {};
     if (state) where.taskState = state;
 
@@ -53,11 +52,11 @@ async function getTaskList(req, res) {
     responsePublic(res, true, {
       pageNo,
       pageSize,
-      total,
+      total: list.length,
       list,
     });
   } catch (err) {
-    responsePublic(res, false, { message: err.message });
+    responsePublic(res, false, null, err.message);
   }
 }
 
@@ -82,10 +81,10 @@ async function addTask(req, res) {
   Task.create(body)
     .then((data) => {
       logger.info(data, ": addTask - data");
-      responsePublic(res, true, { data: data.id });
+      responsePublic(res, true, data.id);
     })
     .catch((err) => {
-      responsePublic(res, false, { message: err.message });
+      responsePublic(res, false, null, err.message);
     });
 }
 
@@ -102,13 +101,16 @@ async function removeTask(req, res) {
       if (num == 1) {
         responsePublic(res, true);
       } else {
-        responsePublic(res, false, {
-          message: `Cannot delete Task with id=${id}. Maybe Task was not found!`,
-        });
+        responsePublic(
+          res,
+          false,
+          null,
+          `Cannot delete Task with id=${id}. Maybe Task was not found!`
+        );
       }
     })
     .catch((err) => {
-      responsePublic(res, false, { message: err.message });
+      responsePublic(res, false, null, err.message);
     });
 }
 
@@ -134,13 +136,11 @@ async function completeTask(req, res) {
       if (num == 1) {
         responsePublic(res, true);
       } else {
-        responsePublic(res, false, {
-          message: `Cannot update Task with id=${id}.`,
-        });
+        responsePublic(res, false, null, `Cannot update Task with id=${id}.`);
       }
     })
     .catch((err) => {
-      responsePublic(res, false, { message: err.message });
+      responsePublic(res, false, null, err.message);
     });
 }
 

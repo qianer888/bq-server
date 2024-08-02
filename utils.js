@@ -47,16 +47,25 @@ const nowTimeFn = function nowTimeFn() {
   )}:${zero(seconds)}`;
 };
 
-// 服务器返回结果
-const responsePublic = function responsePublic(res, flag = true, options) {
-  if (!isPlainObject(options)) options = {};
-  options = Object.assign(
-    {
-      code: flag ? 0 : 1,
-      codeText: flag ? "OK" : "NO",
-    },
-    options
-  );
+/**
+ *
+ * @param {*} res response结果集
+ * @param {*} flag 0 - 成功；1 - 失败
+ * @param {*} data 返回数据
+ * @param {*} msg 成功/失败信息
+ */
+const responsePublic = function responsePublic(
+  res,
+  flag = true,
+  data = null,
+  msg = ""
+) {
+  const options = {
+    code: flag ? 0 : 1,
+    data,
+    codeText: flag ? "SUCCESS" : "ERROR",
+    message: msg ? msg : flag ? "操作成功" : "操作失败",
+  };
   res.send(options);
 };
 
