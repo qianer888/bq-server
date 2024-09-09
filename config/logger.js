@@ -6,4 +6,4 @@ const logger = {
   debug: (...args) => console.debug(`[${new Date()}]`, ...args),
 };
 
-module.exports = { logger };
+module.exports = logger;

@@ -1,11 +1,11 @@
 const db = require("../models");
-const { logger } = require("../config/logger");
+const logger = require("../config/logger");
+const responsePublic = require("../config/responsePublic");
 const sequelize = db.sequelize;
 const Task = db.task;
-const { responsePublic } = require("../utils");
 
 /**
- * TODO: 获取任务列表
+ * 获取任务列表
  * @param {int} pageSize 每页大小
  * @param {int} pageNo 当前页数
  * @param {int} state 任务状态 1未完成 2已完成
@@ -49,14 +49,16 @@ async function getTaskList(req, res) {
       where: where,
     });
 
-    responsePublic(res, true, {
-      pageNo,
-      pageSize,
-      total: list.length,
-      list,
+    responsePublic.success(res, {
+      data: {
+        pageNo,
+        pageSize,
+        total: list.length,
+        list,
+      },
     });
-  } catch (err) {
-    responsePublic(res, false, null, err.message);
+  } catch (error) {
+    responsePublic.error(res, { message: error.message });
   }
 }
 
@@ -69,23 +71,22 @@ async function addTask(req, res) {
   let { taskName, completeTime } = req.body;
   let now = new Date();
 
-  let body = {
-    taskName,
-    taskState: 1,
-    completeTime,
-    actualCompleteTime: null,
-    createTime: now.getTime(),
-    updateTime: null,
-  };
+  try {
+    let body = {
+      taskName,
+      taskState: 1,
+      completeTime,
+      actualCompleteTime: null,
+      createTime: now.getTime(),
+      updateTime: null,
+    };
 
-  Task.create(body)
-    .then((data) => {
-      logger.info(data, ": addTask - data");
-      responsePublic(res, true, data.id);
-    })
-    .catch((err) => {
-      responsePublic(res, false, null, err.message);
-    });
+    const data = await Task.create(body);
+
+    responsePublic.success(res, { data: data.id });
+  } catch (error) {
+    responsePublic.error(res, { message: error.message });
+  }
 }
 
 /**
@@ -94,24 +95,20 @@ async function addTask(req, res) {
  */
 async function removeTask(req, res) {
   let { id } = req.query;
-  Task.destroy({
-    where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        responsePublic(res, true);
-      } else {
-        responsePublic(
-          res,
-          false,
-          null,
-          `Cannot delete Task with id=${id}. Maybe Task was not found!`
-        );
-      }
-    })
-    .catch((err) => {
-      responsePublic(res, false, null, err.message);
+  try {
+    const num = await Task.destroy({
+      where: { id: id },
     });
+
+    if (num !== 1)
+      throw Error(
+        `Cannot delete Task with id=${id}. Maybe Task was not found!`
+      );
+
+    responsePublic.success(res);
+  } catch (error) {
+    responsePublic.error(res, { message: error.message });
+  }
 }
 
 /**
@@ -122,26 +119,23 @@ async function completeTask(req, res) {
   let { id } = req.query;
   let now = new Date();
 
-  Task.update(
-    {
-      taskState: 2,
-      actualCompleteTime: now.getTime(),
-      updateTime: now.getTime(),
-    },
-    {
-      where: { id: id },
-    }
-  )
-    .then((num) => {
-      if (num == 1) {
-        responsePublic(res, true);
-      } else {
-        responsePublic(res, false, null, `Cannot update Task with id=${id}.`);
+  try {
+    const num = await Task.update(
+      {
+        taskState: 2,
+        actualCompleteTime: now.getTime(),
+        updateTime: now.getTime(),
+      },
+      {
+        where: { id: id },
       }
-    })
-    .catch((err) => {
-      responsePublic(res, false, null, err.message);
-    });
+    );
+    if (num !== 1) throw Error(`Cannot update Task with id=${id}.`);
+
+    responsePublic.success(res);
+  } catch (error) {
+    responsePublic.error(res, { message: error.message });
+  }
 }
 
 module.exports = {

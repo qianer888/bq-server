@@ -18,6 +18,7 @@ const filter = function filter(data) {
   }
   return data;
 };
+
 // 延迟函数
 const delay = function delay(interval) {
   typeof interval !== "number" ? (interval = 1000) : null;
@@ -47,26 +48,12 @@ const nowTimeFn = function nowTimeFn() {
   )}:${zero(seconds)}`;
 };
 
-/**
- *
- * @param {*} res response结果集
- * @param {*} flag 0 - 成功；1 - 失败
- * @param {*} data 返回数据
- * @param {*} msg 成功/失败信息
- */
-const responsePublic = function responsePublic(
-  res,
-  flag = true,
-  data = null,
-  msg = ""
-) {
-  const options = {
-    code: flag ? 0 : 1,
-    data,
-    codeText: flag ? "SUCCESS" : "ERROR",
-    message: msg ? msg : flag ? "操作成功" : "操作失败",
-  };
-  res.send(options);
+// 长度在8位及以上的字母，数字，特殊字符组合
+const validPasswd = function validPasswd(str) {
+  const reg =
+    /^(?![A-Za-z0-9]+$)(?![a-z0-9\W_]+$)(?![A-Za-z\W_]+$)(?![A-Z0-9\W_]+$)[a-zA-Z0-9\W_]{8,}$/;
+
+  return reg.test(str);
 };
 
 module.exports = {
@@ -74,5 +61,5 @@ module.exports = {
   filter,
   delay,
   nowTimeFn,
-  responsePublic,
+  validPasswd,
 };
